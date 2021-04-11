@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">Eassy Chat</string>
+    <string name="email">Enter your email  </string>
+    <string name="password">Enter your password</string>
+    <string name="signinbtn">Sign in</string>
+    <string name="login_forget_password"><u>Forgot your password ?</u> </string>
+    <string name="login_dont_have_an_account"><font fgcolor="#ddd">Do not have an Account ?</font><br> <font fgcolor="#18041D"><b>Sign Up Here</b></font>  </br>.</string>
+    <string name="signUP_have_an_account"><font fgcolor="#ddd"> Already have an Account ?</font><br> <font fgcolor="#18041D"><b>Login Here</b></font>  </br>.</string>
+    <string name="login_signUpBtn">Sign Up</string>
+    <string name="userName">Enter user name</string>
+    <string name="home_no_events">No events are available</string>
+</resources>
