@@ -7,6 +7,7 @@ import com.eassychat.R;
 import io.github.inflationx.calligraphy3.CalligraphyConfig;
 import io.github.inflationx.calligraphy3.CalligraphyInterceptor;
 import io.github.inflationx.viewpump.ViewPump;
+import io.paperdb.Paper;
 
 
 public class ApplicationClass extends Application {
@@ -19,7 +20,7 @@ public class ApplicationClass extends Application {
         super.onCreate();
         initApplication();
         set_Calligraphy();
-
+        Paper.init(this);
 
     }
 

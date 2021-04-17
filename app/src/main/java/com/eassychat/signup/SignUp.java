@@ -12,11 +12,18 @@ import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.eassychat.BaseActivity;
 import com.eassychat.R;
 import com.eassychat.home.Home;
 import com.eassychat.login.Login;
+import com.eassychat.response.Details;
+import com.eassychat.response.SignUpResponse;
+import com.eassychat.retorfit.APIConstance;
+import com.eassychat.retorfit.RetrofitClientInstance;
+import com.eassychat.retorfit.methods.DataInterface;
+import com.eassychat.utils.Loading_dialog;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.storage.FirebaseStorage;
@@ -27,10 +34,17 @@ import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import io.paperdb.Book;
+import io.paperdb.Paper;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class SignUp extends BaseActivity {
 
@@ -60,6 +74,7 @@ public class SignUp extends BaseActivity {
     private byte[] data1Sml;
     private Uri thubnailURL;
     private Uri orignalURL;
+    private Loading_dialog loading_dialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -253,6 +268,7 @@ public class SignUp extends BaseActivity {
     }
 
     private void startHomeActivity() {
+       loading_dialog.hideDialog();
         Intent intent = new Intent(this, Home.class);
         startActivity(intent);
     }
@@ -293,7 +309,7 @@ public class SignUp extends BaseActivity {
             emailInputLayout.requestFocus();
             return;
         }
-
+//        sigxnUp();
         uploadOriginalImage(data1);
 
         Log.e(TAG, "verifyingUserInputs: at the end");
@@ -304,6 +320,8 @@ public class SignUp extends BaseActivity {
     }
 
     private void uploadOriginalImage(byte[] data1) {
+        loading_dialog =new Loading_dialog(this);
+        loading_dialog.showDialog();
         StorageReference mountainImagesRef = original.child("images-" + new Date().toString() + ".jpg");
         mountainImagesRef.putBytes(data1).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
             @Override
@@ -312,13 +330,59 @@ public class SignUp extends BaseActivity {
                     @Override
                     public void onSuccess(Uri uri) {
                          orignalURL = uri;
+                        Log.e(TAG, "onSuccess: "+orignalURL );
                         //Do what you want with the url
-                        uploadThumbnail(data1Sml);
+//                        uploadThumbnail(data1Sml);
                         Log.e(TAG, "onSuccess: orignal image ");
+                        sigxnUp();
+
                     }
 
 
                 });
+            }
+        });
+    }
+
+    private void sigxnUp() {
+
+        Log.e(TAG, "sigxnUp: insdide sigbup" );
+        DataInterface dataInterface = RetrofitClientInstance.retrofit.create(DataInterface.class);
+        Map<Object ,String >  body  = new HashMap<>();
+        body.put(APIConstance.NAME,userNameInputLayout.getEditText().getText().toString().trim());
+        body.put(APIConstance.EMAIL,emailInputLayout.getEditText().getText().toString().trim());
+        body.put(APIConstance.PROFILE_PIC,orignalURL.toString());
+        body.put(APIConstance.PASSWORD,passwordInputLayout.getEditText().getText().toString().trim());
+        Call<SignUpResponse> signUp = dataInterface.SignUp(body);
+
+        signUp.enqueue(new Callback<SignUpResponse>() {
+            @Override
+            public void onResponse(Call<SignUpResponse> call, Response<SignUpResponse> response) {
+                Log.e(TAG, "onResponse: "+response.toString() );
+                Log.e(TAG, "onResponse: "+response.errorBody() );
+                Log.e(TAG, "onResponse: "+response.message() );
+                SignUpResponse  response1 = response.body();
+                if (response1.getStatus().equals("success")){
+                    Toast.makeText(SignUp.this, ""+response1.getMessage(), Toast.LENGTH_SHORT).show();
+                   Book book =  Paper.book();
+                    Details  details = response1.getDetails();
+                    book.write(PAPER_EMAIL,details.getEmail());
+                    book.write(PAPER_ID,details.getId());
+                    book.write(PAPER_NAME,details.getName());
+                    book.write(PAPER_PROFILE_PIC,details.getProfilePic());
+                    book.write(PAPER_TOKEN,details.getToken());
+
+                    startHomeActivity();
+                }
+                if (response1.getStatus().equals("fail")){
+                 loading_dialog.hideDialog();
+                    Toast.makeText(SignUp.this, ""+response1.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<SignUpResponse> call, Throwable t) {
+                Log.e(TAG, "onFailure: "+t.toString() );
             }
         });
     }

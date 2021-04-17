@@ -10,12 +10,16 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import com.eassychat.BaseActivity;
 import com.eassychat.R;
 import com.eassychat.home.Home;
+import com.eassychat.response.Details;
+import com.eassychat.response.SignUpResponse;
+import com.eassychat.retorfit.APIConstance;
+import com.eassychat.retorfit.RetrofitClientInstance;
+import com.eassychat.retorfit.methods.DataInterface;
 import com.eassychat.signup.SignUp;
+import com.eassychat.utils.Loading_dialog;
 import com.google.android.material.textfield.TextInputLayout;
 
 import java.util.HashMap;
@@ -23,29 +27,30 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import io.paperdb.Book;
+import io.paperdb.Paper;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 public class Login extends BaseActivity {
 
     private TextInputLayout emailInputLayout, userNameInputLayout, passwordInputLayout;
     TextView loginBTN, signUpHere;
-    private String  email;
+    private String email;
     private String password;
     private boolean isValidEmailOrPhone = false;
     private static String TAG = Login.class.getSimpleName();
+    private Loading_dialog loading_dialog;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-
-
-
-
-//        previousLoginCheck();
         findViews();
 
     }
-
 
 
     public void signInClick(View view) {
@@ -138,7 +143,7 @@ public class Login extends BaseActivity {
             passwordInputLayout.requestFocus();
             return;
         }
-        loginPostRequest();
+        loginRequest();
     }
 
     public void signUpClick(View view) {
@@ -147,61 +152,47 @@ public class Login extends BaseActivity {
     }
 
 
-    private void loginPostRequest() {
-        startHomeActivity();
-//        loading_dialog.showDialog();
-//        ApiInterface apiInterface = ApiConstance.retrofit.create(ApiInterface.class);
-//        Map<String, Object> body = new HashMap<>();
-//        body.put(ConstantString.EMAIL, emailInputLayout.getEditText().getText().toString());
-//        body.put(ConstantString.PASSWORD, passwordInputLayout.getEditText().getText().toString());
-//        call = apiInterface.login(body);
-//        call.enqueue(new Callback<LoginResponse>() {
-//            @Override
-//            public void onResponse(Call<LoginResponse> call, Response<LoginResponse> response) {
-//                Log.e(TAG, "onResponse: login  " + response);
-//                if (response.code() == 200) {
-//                    if (response.isSuccessful()) {
-//                        LoginResponse loginResponse = response.body();
-////                                Log.e(TAG, "onResponse:  dfsdf " + response.toString()+" rsponse message-> "+response.body().getMessage()+
-////                                        " \n\n "+response.body()+" \\n resonse status-> "+response.body().getStatus()+
-////                                        " response detail-> "+response.body().getDetails());
-//                        if (loginResponse.isError()) {
-//                            Log.e(TAG, "\n\n\n\n\nonResponse: getmessage-> " + loginResponse.getMessage());
-//                            Toast.makeText(Login.this, "" + loginResponse.getMessage(), Toast.LENGTH_SHORT).show();
-//                            loading_dialog.hideDialog();
-//                        } else {
-//                            LoginResponse.Details details = loginResponse.getDetails();
-//                            Log.e(TAG, "\n\n\n\n\n\nonResponse: " + details.getName() + "  \n\n\n\ntoken-> " + details.getToken());
-//                            Book book = Paper.book();
-//                            book.write(ConstantString.PAPER_TOKEN, details.getToken());
-//                            book.write(ConstantString.PAPER_ID, details.getId());
-//                            book.write(ConstantString.PAPER_USER_NAME, details.getName());
-//                            book.write(ConstantString.PAPER_LOGIN_POJO, details);
-//                            startHomeActivity();
-//                            loading_dialog.hideDialog();
-//                        }
-//
-//                    } else {
-//                        Log.e(TAG, "onResponse: error --->" + TextStreamsKt.readText(response.errorBody().charStream()));
-//                        loading_dialog.hideDialog();
-//                    }
-//                } else {
-//                    if (response.errorBody() != null) {
-//                        Toast.makeText(Login.this, "" + TextStreamsKt.readText(response.errorBody().charStream()), Toast.LENGTH_SHORT).show();
-//                        Log.e(TAG, "onResponse: login errror body " + response.toString());
-//                        loading_dialog.hideDialog();
-//                    }
-//
-//                }
-//            }
-//
-//            @Override
-//            public void onFailure(Call<LoginResponse> call, Throwable t) {
-//                Log.e(TAG, "onFailure: login " + call.toString());
-//                loading_dialog.hideDialog();
-//                Toast.makeText(Login.this, "" + t.getMessage(), Toast.LENGTH_SHORT).show();
-//            }
-//        });
+    private void loginRequest() {
+        loading_dialog = new Loading_dialog(this);
+        loading_dialog.showDialog();
+        Log.e(TAG, "sigxnUp: insdide sigbup");
+        DataInterface dataInterface = RetrofitClientInstance.retrofit.create(DataInterface.class);
+        Map<Object, String> body = new HashMap<>();
+
+        body.put(APIConstance.EMAIL, emailInputLayout.getEditText().getText().toString().trim());
+        body.put(APIConstance.PASSWORD, passwordInputLayout.getEditText().getText().toString().trim());
+        Call<SignUpResponse> signUp = dataInterface.LogIn(body);
+
+        signUp.enqueue(new Callback<SignUpResponse>() {
+            @Override
+            public void onResponse(Call<SignUpResponse> call, Response<SignUpResponse> response) {
+                Log.e(TAG, "onResponse: " + response.toString());
+                Log.e(TAG, "onResponse: " + response.errorBody());
+                Log.e(TAG, "onResponse: " + response.message());
+                SignUpResponse response1 = response.body();
+                if (response1.getStatus().equals("success")) {
+                    Toast.makeText(Login.this, "" + response1.getMessage(), Toast.LENGTH_SHORT).show();
+                    Book book = Paper.book();
+                    Details details = response1.getDetails();
+                    book.write(PAPER_EMAIL, details.getEmail());
+                    book.write(PAPER_ID, details.getId());
+                    book.write(PAPER_NAME, details.getName());
+                    book.write(PAPER_PROFILE_PIC, details.getProfilePic());
+                    book.write(PAPER_TOKEN, details.getToken());
+
+                    startHomeActivity();
+                }
+                if (response1.getStatus().equals("fail")) {
+                    loading_dialog.hideDialog();
+                    Toast.makeText(Login.this, "" + response1.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<SignUpResponse> call, Throwable t) {
+                Log.e(TAG, "onFailure: " + t.toString());
+            }
+        });
     }
 
     @Override
@@ -211,7 +202,7 @@ public class Login extends BaseActivity {
     }
 
     private void startHomeActivity() {
-
+        loading_dialog.hideDialog();
         Intent intent = new Intent(this, Home.class);
         startActivity(intent);
         finish();

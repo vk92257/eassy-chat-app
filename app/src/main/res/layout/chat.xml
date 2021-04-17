@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+
+    android:orientation="vertical">
+
+
+    <LinearLayout
+        android:layout_margin="5dp"
+        android:id="@+id/viewProfile"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:clickable="true"
+        android:elevation="5dp"
+        android:gravity="center|start"
+        android:orientation="horizontal"
+        android:visibility="visible"
+        android:weightSum="10">
+
+        <ImageView
+            android:id="@+id/back_button"
+            android:layout_width="30dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:adjustViewBounds="true"
+            android:padding="5dp"
+            android:src="@drawable/ic_backbtn"
+            android:tint="@color/black"
+            android:visibility="visible" />
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/profileimage"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_margin="5dp"
+            android:elevation="3dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/sample1"
+            android:visibility="visible "
+            app:civ_border_color="@android:color/black"
+            app:civ_border_width="2dp"
+            app:civ_circle_background_color="@color/white" />
+
+        <TextView
+            android:id="@+id/chatTitle"
+            fontPath="fonts/gotham.ttf"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginStart="10dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:singleLine="true"
+            android:text="Neil Armstong"
+            android:textColor="@color/secondarycolor"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+    </LinearLayout>
+
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="10"
+        android:background="@color/verylightgray2">
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:alpha="0.10"
+            android:background="@color/secondarycolor" />
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <androidx.swiperefreshlayout.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:id="@+id/swipeContainer"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="9.5">
+
+                <com.cooltechworks.views.shimmer.ShimmerRecyclerView
+                    android:id="@+id/message_recycler"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:padding="10dp"
+                    app:shimmer_demo_angle="30"
+                    app:shimmer_demo_child_count="6"
+                    app:shimmer_demo_grid_child_count="5"
+                    app:shimmer_demo_layout="@layout/chat_shinner_layout"
+                    app:shimmer_demo_layout_manager_type="linear_vertical" />
+            </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+            <LinearLayout
+                android:id="@+id/input_bar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginBottom="8dp"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:visibility="gone">
+
+                <androidx.cardview.widget.CardView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:clickable="true"
+                    android:elevation="4dp"
+                    app:cardBackgroundColor="@color/verylightgray2">
+
+                    <ImageView
+                        android:id="@+id/attachment"
+                        android:layout_width="60dp"
+                        android:layout_height="50dp"
+                        android:padding="10dp"
+                        android:src="@drawable/ic_attachment" />
+                </androidx.cardview.widget.CardView>
+
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/back"
+                    android:layout_width="wrap_content"
+                    android:layout_height="50dp"
+                    android:layout_weight="1"
+                    android:clickable="true"
+                    android:elevation="4dp"
+                    android:visibility="visible"
+                    app:cardBackgroundColor="@color/verylightgray2">
+
+                    <EditText
+                        android:id="@+id/input"
+                        android:layout_width="match_parent"
+                        android:layout_height="50dp"
+                        android:background="@android:color/transparent"
+                        android:focusableInTouchMode="true"
+                        android:hint="Type something..."
+                        android:paddingLeft="13dp"
+                        android:paddingRight="5dp"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                        android:textColor="#333333"
+                        android:textColorHint="#A1636668" />
+                </androidx.cardview.widget.CardView>
+
+                <androidx.cardview.widget.CardView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:clickable="true"
+                    android:elevation="4dp"
+                    app:cardBackgroundColor="@color/secondarycolor">
+
+                    <ImageView
+                        android:id="@+id/messag_send"
+                        android:layout_width="60dp"
+                        android:layout_height="50dp"
+                        android:padding="13dp"
+                        android:src="@drawable/ic_baseline_send_24"
+                        android:tint="@color/white" />
+
+                </androidx.cardview.widget.CardView>
+
+
+            </LinearLayout>
+        </LinearLayout>
+
+        <com.wang.avi.AVLoadingIndicatorView
+            android:id="@+id/avi"
+            style="@style/AVLoadingIndicatorView"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_gravity="center"
+            android:layout_marginBottom="100dp"
+            android:visibility="invisible"
+            app:indicatorColor="@color/secondarycolor"
+            app:indicatorName="BallScaleMultipleIndicator" />
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/attachment_content"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:layout_marginLeft="15dp"
+            android:layout_marginBottom="65dp"
+            android:gravity="left"
+            android:orientation="horizontal"
+            android:visibility="gone"
+            app:cardCornerRadius="10dp">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@android:color/transparent"
+                android:orientation="horizontal"
+                android:padding="5dp">
+
+                <ImageView
+                    android:id="@+id/camera"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:background="@android:color/transparent"
+                    android:padding="10dp"
+                    android:src="@drawable/gallery_one" />
+
+                <ImageView
+                    android:id="@+id/video"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:background="@android:color/transparent"
+                    android:padding="10dp"
+                    android:src="@drawable/video" />
+            </LinearLayout>
+
+        </androidx.cardview.widget.CardView>
+    </FrameLayout>
+
+
+    <!--    <include layout="@layout/chatmessage_input_box" />-->
+
+</LinearLayout>

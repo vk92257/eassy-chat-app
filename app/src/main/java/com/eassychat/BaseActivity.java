@@ -8,9 +8,11 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.eassychat.retorfit.APIConstance;
+
 import io.github.inflationx.viewpump.ViewPumpContextWrapper;
 
-public class BaseActivity extends AppCompatActivity {
+public class BaseActivity extends AppCompatActivity implements APIConstance {
     private Vibrator v;
 
     @Override
